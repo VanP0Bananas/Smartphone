@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFinder - Умный подбор смартфона</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1e88e5;
+            --light-blue: #64b5f6;
+            --very-light-blue: #e3f2fd;
+            --accent-blue: #0d47a1;
+            --text-dark: #263238;
+            --text-light: #546e7a;
+            --white: #ffffff;
+            --shadow: rgba(30, 136, 229, 0.15);
+            --transition: all 0.3s ease;
+            --header-height: 80px;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --purple: #9c27b0;
+        }
+
+        body {
+            background-color: #f8fbff;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Новый хэдер */
+        .main-header {
+            position: sticky;
+            top: 0px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(30, 136, 229, 0.1);
+            height: var(--header-height);
+            border-bottom: 3px solid var(--primary-blue);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 13px;
+            height: 100%;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 40px;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--light-blue));
+            border-radius: 2px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            color: white;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(30, 136, 229, 0.2);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Навигационное меню */
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            margin-left: auto;
+            margin-right: 40px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 8px 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transition: var(--transition);
+            border-radius: 1px;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Иконки действий */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .action-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--very-light-blue);
+            border-radius: 12px;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(30, 136, 229, 0.1);
+        }
+
+        .action-icon:hover {
+            background-color: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(30, 136, 229, 0.2);
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4757;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid white;
+            box-shadow: 0 3px 8px rgba(30, 136, 229, 0.2);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+        }
+
+        /* Мобильное меню */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        /* Hero section */
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(30, 136, 229, 0.3);
+            margin-bottom: 40px;
+            margin-top: 0px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M30 0L60 30L30 60L0 30Z" fill="white" opacity="0.05"/></svg>');
+        }
+
+        .hero-title {
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .hero-subtitle {
+            align-items: center;
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Основное содержимое */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding-bottom: 60px;
+        }
+
+        /* Progress indicator */
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 10px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background-color: var(--primary-blue);
+            z-index: 2;
+            transition: var(--transition);
+            width: 0%;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            width: 33.33%;
+        }
+
+        .step-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            border: 4px solid white;
+            box-shadow: 0 3px 6px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .step.active .step-circle {
+            background-color: var(--primary-blue);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-circle {
+            background-color: var(--light-blue);
+            color: white;
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: var(--text-light);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* Questionnaire container */
+        .questionnaire-container {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid rgba(30, 136, 229, 0.1);
+        }
+
+        .questionnaire-header {
+            background: linear-gradient(to right, var(--very-light-blue), #f0f7ff);
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(30, 136, 229, 0.1);
+        }
+
+        .questionnaire-header h2 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .questionnaire-header p {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .questionnaire-body {
+            padding: 30px;
+            min-height: 500px;
+            position: relative;
+        }
+
+        /* Questionnaire screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Screen 1: Basic characteristics */
+        .characteristics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .characteristic-group {
+            background-color: var(--very-light-blue);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .characteristic-group h3 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .characteristic-group h3 i {
+            color: var(--primary-blue);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        /* Стили для ползунка цены */
+        .price-slider-container {
+            margin: 20px 0 30px;
+        }
+
+        .price-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #e0e0e0, var(--primary-blue));
+            border-radius: 4px;
+            outline: none;
+            margin: 15px 0;
+        }
+
+        .price-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .price-slider::-webkit-slider-thumb:hover {
+            background: var(--accent-blue);
+            transform: scale(1.1);
+        }
+
+        .price-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .price-slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .price-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            padding: 5px 10px;
+            background-color: var(--very-light-blue);
+            border-radius: 6px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .price-range-display {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .price-range-display span {
+            color: var(--text-light);
+            font-weight: 600;
+            margin: 0 10px;
+        }
+
+        /* Остальные стили для input и select */
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+        }
+
+        /* Screen 2: Priority selection */
+        .priority-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .priority-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .priority-option {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .priority-option:hover {
+            transform: translateY(-5px);
+            border-color: var(--light-blue);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .priority-option.selected {
+            border-color: var(--primary-blue);
+            background-color: var(--very-light-blue);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .priority-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        .priority-option h3 {
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .priority-option p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Detailed characteristics for selected priority */
+        .priority-details {
+            background-color: var(--very-light-blue);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .priority-details.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .priority-details h3 {
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(30, 136, 229, 0.2);
+        }
+
+        .detail-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .detail-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        /* Screen 3: Summary */
+        .summary-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .summary-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .summary-header h3 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .summary-details {
+            background-color: var(--very-light-blue);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-section h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-section h4 i {
+            color: var(--primary-blue);
+        }
+
+        .summary-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .summary-item {
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(30, 136, 229, 0.2);
+        }
+
+        .summary-item strong {
+            color: var(--primary-blue);
+            margin-right: 5px;
+        }
+
+        /* Улучшенные стили для карточек критериев */
+        .priority-criteria-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--purple);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .priority-criteria-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--purple);
+        }
+
+        .priority-criteria-header i {
+            font-size: 1.3rem;
+        }
+
+        .priority-criteria-header h5 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--purple);
+        }
+
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .criterion-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .criterion-item:last-child {
+            border-bottom: none;
+        }
+
+        .criterion-name {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .criterion-value {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        .confirmation-message {
+            text-align: center;
+            padding: 25px;
+            background-color: #e8f5e9;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .confirmation-message h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .confirmation-message p {
+            color: #388e3c;
+            font-size: 1rem;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px 30px;
+            background-color: #f8fafc;
+            border-top: 1px solid rgba(30, 136, 229, 0.1);
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Новая кнопка "Показать смартфоны" */
+        .btn-show {
+            background: linear-gradient(to right, #64b5f6, #1e88e5);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-show:hover {
+            background: linear-gradient(to right, #43a047, #1b5e20);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-prev {
+            background-color: white;
+            color: var(--text-light);
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-prev:hover {
+            background-color: #f5f5f5;
+            border-color: var(--text-light);
+        }
+
+        .btn-next, .btn-find, .btn-confirm {
+            background: linear-gradient(to right, var(--primary-blue), var(--light-blue));
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 136, 229, 0.3);
+        }
+
+        .btn-next:hover, .btn-find:hover, .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(30, 136, 229, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Футер */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid rgba(30, 136, 229, 0.1);
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .nav-menu {
+                gap: 20px;
+                margin-right: 20px;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-header {
+                height: 70px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-top: 2px solid var(--primary-blue);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-link {
+                padding: 12px 0;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+            
+            .header-actions {
+                gap: 10px;
+            }
+            
+            .action-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo-text span {
+                font-size: 0.8rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .characteristics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .priority-options {
+                flex-direction: column;
+            }
+            
+            .priority-option {
+                min-width: 100%;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Хэдер -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>ClickSmart</h1>
+                        <span>Умный подбор смартфонов</span>
+                    </div>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav class="nav-menu" id="navMenu">
+                    <a href="#" class="nav-link active">Главная</a>
+                    <a href="#" class="nav-link">Новинки</a>
+                    <a href="#" class="nav-link">Хиты продаж</a>
+                    <a href="#" class="nav-link">Дорогие</a>
+                    <a href="#" class="nav-link">Бюджетные</a>
+                </nav>
+                
+                <div class="header-actions">
+                    <div class="action-icon" id="compareBtn">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    
+                    <div class="action-icon" id="favoritesBtn">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    
+                    <div class="user-avatar" id="userBtn">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Найди свой идеальный смартфон</h1>
+            <p class="hero-subtitle">Ответьте на несколько вопросов и получите персонализированные рекомендации от нашей умной системы на основе более 500 моделей смартфонов</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Progress indicator -->
+            <div class="progress-container">
+                <div class="progress-steps">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="step active" id="step1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Основные параметры</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Приоритеты</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Подтверждение</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questionnaire container -->
+            <div class="questionnaire-container">
+                <div class="questionnaire-header">
+                    <h2 id="screenTitle">Основные характеристики</h2>
+                    <p id="screenDescription">Укажите базовые параметры смартфона, который вы ищете</p>
+                </div>
+
+                <div class="questionnaire-body">
+                    <!-- Screen 1: Basic characteristics -->
+                    <div class="screen active" id="screen1">
+                        <div class="characteristics-grid">
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-tag"></i> Цена и доступность</h3>
+                                <div class="price-slider-container">
+                                    <div class="price-range-display">
+                                        <span id="minPriceDisplay">15 000</span> - 
+                                        <span id="maxPriceDisplay">50 000</span> ₽
+                                    </div>
+                                    <input type="range" min="5000" max="200000" step="1000" value="15000" class="price-slider" id="minPriceSlider">
+                                    <input type="range" min="5000" max="200000" step="1000" value="50000" class="price-slider" id="maxPriceSlider">
+                                    <div class="price-slider-labels">
+                                        <div class="price-label">5 000 ₽</div>
+                                        <div class="price-label">200 000 ₽</div>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Наличие</label>
+                                    <select id="availability">
+                                        <option value="any">Любое</option>
+                                        <option value="in_stock">Только в наличии</option>
+                                        <option value="can_order">Можно заказать</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-paint-brush"></i> Внешний вид</h3>
+                                <div class="input-group">
+                                    <label>Цвет</label>
+                                    <select id="color">
+                                        <option value="any">Любой</option>
+                                        <option value="black">Черный</option>
+                                        <option value="white">Белый</option>
+                                        <option value="blue">Синий</option>
+                                        <option value="gray">Серый</option>
+                                        <option value="green">Зеленый</option>
+                                        <option value="red">Красный</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Операционная система</label>
+                                    <select id="os">
+                                        <option value="any">Любая</option>
+                                        <option value="android">Android</option>
+                                        <option value="ios">iOS</option>
+                                        <option value="other">Другая</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-microchip"></i> Память</h3>
+                                <div class="input-group">
+                                    <label>Оперативная память (ОЗУ)</label>
+                                    <select id="ram">
+                                        <option value="any">Любая</option>
+                                        <option value="4">4 ГБ</option>
+                                        <option value="6">6 ГБ</option>
+                                        <option value="8" selected>8 ГБ</option>
+                                        <option value="12">12 ГБ</option>
+                                        <option value="16">16 ГБ и более</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Встроенная память</label>
+                                    <select id="storage">
+                                        <option value="any">Любая</option>
+                                        <option value="64">64 ГБ</option>
+                                        <option value="128" selected>128 ГБ</option>
+                                        <option value="256">256 ГБ</option>
+                                        <option value="512">512 ГБ</option>
+                                        <option value="1024">1 ТБ и более</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-tv"></i> Экран</h3>
+                                <div class="input-group">
+                                    <label>Диагональ экрана</label>
+                                    <select id="screenSize">
+                                        <option value="any">Любая</option>
+                                        <option value="small">До 6.0"</option>
+                                        <option value="medium" selected>6.0" - 6.5"</option>
+                                        <option value="large">6.5" - 6.8"</option>
+                                        <option value="xlarge">Более 6.8"</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Тип матрицы</label>
+                                    <select id="displayType">
+                                        <option value="any">Любой</option>
+                                        <option value="oled">OLED/AMOLED</option>
+                                        <option value="ips">IPS</option>
+                                        <option value="lcd">LCD</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-battery-full"></i> Аккумулятор и зарядка</h3>
+                                <div class="input-group">
+                                    <label>Емкость аккумулятора</label>
+                                    <select id="battery">
+                                        <option value="any">Любая</option>
+                                        <option value="small">До 4000 мАч</option>
+                                        <option value="medium" selected>4000 - 5000 мАч</option>
+                                        <option value="large">Более 5000 мАч</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Тип зарядки</label>
+                                    <select id="charging">
+                                        <option value="any">Любой</option>
+                                        <option value="fast">Быстрая зарядка</option>
+                                        <option value="wireless">Беспроводная зарядка</option>
+                                        <option value="both">Оба варианта</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="characteristic-group">
+                                <h3><i class="fas fa-ruler-combined"></i> Дополнительно</h3>
+                                <div class="input-group">
+                                    <label>NFC</label>
+                                    <select id="nfc">
+                                        <option value="any">Не важно</option>
+                                        <option value="yes" selected>Да, обязательно</option>
+                                        <option value="no">Нет</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Размер и вес</label>
+                                    <select id="size">
+                                        <option value="any">Любой</option>
+                                        <option value="compact">Компактный</option>
+                                        <option value="standard" selected>Стандартный</option>
+                                        <option value="large">Крупный</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screen 2: Priority selection -->
+                    <div class="screen" id="screen2">
+                        <div class="priority-selection">
+                            <p style="margin-bottom: 20px; color: var(--text-light); font-size: 1.1rem;">Выберите основной приоритет использования смартфона:</p>
+                            
+                            <div class="priority-options">
+                                <div class="priority-option" data-priority="gaming">
+                                    <div class="priority-icon">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                    <h3>Игры</h3>
+                                    <p>Максимальная производительность, плавная графика, игровые функции</p>
+                                </div>
+                                
+                                <div class="priority-option" data-priority="camera">
+                                    <div class="priority-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <h3>Камера</h3>
+                                    <p>Высокое качество фото и видео, профессиональные режимы съемки</p>
+                                </div>
+                                
+                                <div class="priority-option" data-priority="battery">
+                                    <div class="priority-icon">
+                                        <i class="fas fa-battery-full"></i>
+                                    </div>
+                                    <h3>Автономность</h3>
+                                    <p>Длительная работа от аккумулятора, быстрая зарядка, энергоэффективность</p>
+                                </div>
+                            </div>
+
+                            <!-- Detailed options for gaming -->
+                            <div class="priority-details" id="gaming-details">
+                                <h3><i class="fas fa-gamepad"></i> Параметры для игр</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <label>Название процессора</label>
+                                        <select id="gaming-processor-name">
+                                            <option value="any">Любой</option>
+                                            <option value="Apple Bionic">Apple Bionic</option>
+                                            <option value="Snapdragon">Snapdragon</option>
+                                            <option value="MediaTek">MediaTek</option>
+                                            <option value="Samsung Exynos">Samsung Exynos</option>
+                                            <option value="Google Tensor">Google Tensor</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Техпроцесс процессора</label>
+                                        <select id="gaming-tech-process">
+                                            <option value="any">Любой</option>
+                                            <option value="3nm">3 нм (самый эффективный)</option>
+                                            <option value="4nm">4 нм</option>
+                                            <option value="5nm">5 нм</option>
+                                            <option value="6nm">6 нм и более</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Графический ускоритель</label>
+                                        <select id="gaming-gpu">
+                                            <option value="any">Любой</option>
+                                            <option value="Apple GPU">Apple GPU</option>
+                                            <option value="Adreno">Adreno</option>
+                                            <option value="Mali">Mali</option>
+                                            <option value="Xclipse">Xclipse</option>
+                                            <option value="PowerVR">PowerVR</option>
+                                            <option value="Maleoon">Maleoon</option>
+                                            <option value="Immortalis">Immortalis</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Частота обновления экрана</label>
+                                        <select id="gaming-refresh">
+                                            <option value="any">Любая</option>
+                                            <option value="60">60 Гц</option>
+                                            <option value="90">90 Гц</option>
+                                            <option value="120">120 Гц</option>
+                                            <option value="144">144 Гц и выше</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Частота опроса тачскрина</label>
+                                        <select id="gaming-touch-sampling">
+                                            <option value="any">Любая</option>
+                                            <option value="240">240 Гц</option>
+                                            <option value="480">480 Гц</option>
+                                            <option value="1000">1000 Гц</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Звук в играх</label>
+                                        <select id="gaming-audio">
+                                            <option value="any">Любой</option>
+                                            <option value="stereo">Стерео</option>
+                                            <option value="mono">Моно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Система охлаждения</label>
+                                        <select id="gaming-cooling">
+                                            <option value="any">Любая</option>
+                                            <option value="vapor">Вакуумная камера</option>
+                                            <option value="graphite">Графитовая пленка</option>
+                                            <option value="advanced">Продвинутая система</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Игровые триггеры</label>
+                                        <select id="gaming-triggers">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, желательно</option>
+                                            <option value="no">Не нужно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Скорость зарядки</label>
+                                        <select id="gaming-charging">
+                                            <option value="any">Любая</option>
+                                            <option value="super">Очень быстрая (65W+)</option>
+                                            <option value="fast">Быстрая (30-65W)</option>
+                                            <option value="standard">Стандартная (до 30W)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Температурный режим</label>
+                                        <select id="gaming-temperature">
+                                            <option value="any">Не важно</option>
+                                            <option value="mid">Средний</option>
+                                            <option value="high">Высокий</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed options for camera -->
+                            <div class="priority-details" id="camera-details">
+                                <h3><i class="fas fa-camera"></i> Параметры камеры</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <label>Тип сенсора</label>
+                                        <select id="camera-sensor-type">
+                                            <option value="any">Любой</option>
+                                            <option value="Sony">Sony</option>
+                                            <option value="Samsung">Samsung</option>
+                                            <option value="Omnivision">Omnivision</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Размер сенсора</label>
+                                        <select id="camera-sensor-size">
+                                            <option value="any">Любой</option>
+                                            <option value="large">Большой (1/1.12" и более)</option>
+                                            <option value="medium">Средний (1/1.28")</option>
+                                            <option value="small">Стандартный</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Размер пикселя</label>
+                                        <select id="camera-pixel-size">
+                                            <option value="any">Любой</option>
+                                            <option value="small">Маленькие (менее 1.0 мкм)</option>
+                                            <option value="standard">Стандартные (1.0 - 1.5 мкм)</option>
+                                            <option value="large">Крупные (1.6 - 2.5 мкм)</option>
+                                            <option value="very-large">Очень крупные (более 2.5 мкм)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Диафрагма</label>
+                                        <select id="camera-aperture">
+                                            <option value="any">Любая</option>
+                                            <option value="very-bright">Сверхсветосильные (f/1.6 и менее)</option>
+                                            <option value="bright">Светосильные (f/1.8-f/2.4)</option>
+                                            <option value="standard">Стандартные (f/2.5+)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Оптическая стабилизация</label>
+                                        <select id="camera-ois">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, обязательно</option>
+                                            <option value="no">Не обязательно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Ультраширик</label>
+                                        <select id="camera-ultrawide">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, обязательно</option>
+                                            <option value="no">Не обязательно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Макрообъектив</label>
+                                        <select id="camera-macro">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, обязательно</option>
+                                            <option value="no">Не обязательно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Телеобъектив</label>
+                                        <select id="camera-tele">
+                                            <option value="any">Не важно</option>
+                                            <option value="2x">2x увеличение</option>
+                                            <option value="3x">3x увеличение</option>
+                                            <option value="5x">5x и более</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Автофокус фронтальной камеры</label>
+                                        <select id="camera-front-af">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, обязательно</option>
+                                            <option value="no">Не обязательно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Видеосъемка</label>
+                                        <select id="camera-video">
+                                            <option value="any">Любая</option>
+                                            <option value="4k60">4K@60fps</option>
+                                            <option value="4k30">4K@30fps</option>
+                                            <option value="8k">8K</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed options for battery -->
+                            <div class="priority-details" id="battery-details">
+                                <h3><i class="fas fa-battery-full"></i> Параметры автономности</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <label>Тип аккумулятора</label>
+                                        <select id="battery-type">
+                                            <option value="any">Не важно</option>
+                                            <option value="Li-Po">Li-Po (Литий-полимерный)</option>
+                                            <option value="Li-Ion">Li-Ion (Литий-ионный)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Реальная автономность</label>
+                                        <select id="battery-life">
+                                            <option value="any">Любая</option>
+                                            <option value="high">Высокая (10+ часов экрана)</option>
+                                            <option value="medium">Средняя (7-10 часов)</option>
+                                            <option value="standard">Стандартная (5-7 часов)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Мощность зарядки</label>
+                                        <select id="battery-charge-power">
+                                            <option value="any">Любая</option>
+                                            <option value="super">Очень быстрая (65W+)</option>
+                                            <option value="fast">Быстрая (30-65W)</option>
+                                            <option value="standard">Стандартная (до 30W)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Беспроводная зарядка</label>
+                                        <select id="battery-wireless">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, обязательно</option>
+                                            <option value="fast">Да, с быстрой зарядкой</option>
+                                            <option value="no">Не нужно</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Мощность обратной зарядки</label>
+                                        <select id="battery-reverse">
+                                            <option value="any">Не важно</option>
+                                            <option value="low">Слабая (2.5-5W)</option>
+                                            <option value="standard">Стандартная (5-7.5W)</option>
+                                            <option value="high">Мощная (10-15W)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Энергоэффективный экран</label>
+                                        <select id="battery-screen">
+                                            <option value="any">Не важно</option>
+                                            <option value="ltpo">LTPO с адаптивной частотой</option>
+                                            <option value="standard">Стандартный</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Износ батареи</label>
+                                        <select id="battery-degradation">
+                                            <option value="any">Не важно</option>
+                                            <option value="low">Низкий износ (80%+ после 500 циклов)</option>
+                                            <option value="standard">Стандартный</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Режимы энергосбережения</label>
+                                        <select id="battery-saver-modes">
+                                            <option value="any">Не важно</option>
+                                            <option value="adaptive">Адаптивный режим</option>
+                                            <option value="scheduled">По расписанию</option>
+                                            <option value="ultra">Ультрарежим</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Быстрая зарядка за 15 минут</label>
+                                        <select id="battery-15min-charge">
+                                            <option value="any">Не важно</option>
+                                            <option value="high">Высокая (70-80%)</option>
+                                            <option value="medium">Средняя (50-60%)</option>
+                                            <option value="low">Низкая (30-40%)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <label>Энергоэффективный процессор</label>
+                                        <select id="battery-efficient-cpu">
+                                            <option value="any">Не важно</option>
+                                            <option value="yes">Да, с low-power ядрами</option>
+                                            <option value="no">Не обязательно</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screen 3: Summary -->
+                    <div class="screen" id="screen3">
+                        <div class="summary-container">
+                            <div class="summary-header">
+                                <h3>Проверьте ваши критерии</h3>
+                                <p>Убедитесь, что все параметры выбраны верно перед поиском рекомендаций</p>
+                            </div>
+                            
+                            <div class="confirmation-message">
+                                <h4><i class="fas fa-check-circle"></i> Все готово!</h4>
+                                <p>Система проанализировала ваши предпочтения и готова подобрать идеальный смартфон.</p>
+                            </div>
+                            
+                            <div class="summary-details">
+                                <div class="summary-section">
+                                    <h4><i class="fas fa-tag"></i> Основные параметры</h4>
+                                    <div class="summary-list" id="summary-basic">
+                                        <!-- Filled by JavaScript -->
+                                    </div>
+                                </div>
+                                
+                                <div class="summary-section">
+                                    <h4><i class="fas fa-star"></i> Приоритет и детальные требования</h4>
+                                    <div id="summary-priority-container">
+                                        <!-- Filled by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 30px;">
+                                <p style="color: var(--text-light); font-size: 1rem;">Нажмите "Найти смартфон", чтобы получить персонализированные рекомендации</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-show" id="showPhonesBtn" style="display: none;">
+                        <a href="Smartphone.html"><i class="fas fa-eye"></i> Показать смартфоны</a>
+                    </button>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn btn-prev" id="prevBtn" disabled>
+                            <i class="fas fa-arrow-left"></i> Назад
+                        </button>
+                        <button class="btn btn-find" id="findBtn" style="display: none;">
+                            <a href="Smartphone.html"><i class="fas fa-search"></i> Найти смартфон</a>
+                        </button>
+                        <button class="btn btn-next" id="nextBtn">
+                            Далее <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 ClickSmart. Умная система подбора смартфонов. Все права защищены.</p>
+            <p>Рекомендации формируются на основе актуальных данных о более чем 500 моделях смартфонов.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Current screen index
+        let currentScreen = 1;
+        const totalScreens = 3;
+        let selectedPriority = null;
+
+        // DOM elements
+        const screens = document.querySelectorAll('.screen');
+        const progressBar = document.getElementById('progressBar');
+        const steps = document.querySelectorAll('.step');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const findBtn = document.getElementById('findBtn');
+        const showPhonesBtn = document.getElementById('showPhonesBtn');
+        const screenTitle = document.getElementById('screenTitle');
+        const screenDescription = document.getElementById('screenDescription');
+        
+        // Price slider elements
+        const minPriceSlider = document.getElementById('minPriceSlider');
+        const maxPriceSlider = document.getElementById('maxPriceSlider');
+        const minPriceDisplay = document.getElementById('minPriceDisplay');
+        const maxPriceDisplay = document.getElementById('maxPriceDisplay');
+        
+        // Priority selection elements
+        const priorityOptions = document.querySelectorAll('.priority-option');
+        const priorityDetails = document.querySelectorAll('.priority-details');
+        
+        // Header elements
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        const compareBtn = document.getElementById('compareBtn');
+        const favoritesBtn = document.getElementById('favoritesBtn');
+        const userBtn = document.getElementById('userBtn');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        // Initialize price slider
+        function initPriceSlider() {
+            function formatPrice(price) {
+                return new Intl.NumberFormat('ru-RU').format(price);
+            }
+            
+            function updatePriceDisplay() {
+                const minPrice = parseInt(minPriceSlider.value);
+                const maxPrice = parseInt(maxPriceSlider.value);
+                
+                minPriceDisplay.textContent = formatPrice(minPrice);
+                maxPriceDisplay.textContent = formatPrice(maxPrice);
+                
+                // Ensure min is not greater than max
+                if (minPrice > maxPrice) {
+                    minPriceSlider.value = maxPrice;
+                    minPriceDisplay.textContent = formatPrice(maxPrice);
+                }
+            }
+            
+            // Set initial display
+            updatePriceDisplay();
+            
+            // Add event listeners
+            minPriceSlider.addEventListener('input', updatePriceDisplay);
+            maxPriceSlider.addEventListener('input', updatePriceDisplay);
+            
+            // Add visual feedback
+            minPriceSlider.addEventListener('input', function() {
+                this.style.background = `linear-gradient(to right, #e0e0e0 0%, var(--primary-blue) ${(this.value - 5000) / 1950}%, #e0e0e0 ${(this.value - 5000) / 1950}%, #e0e0e0 100%)`;
+            });
+            
+            maxPriceSlider.addEventListener('input', function() {
+                this.style.background = `linear-gradient(to right, #e0e0e0 0%, var(--primary-blue) ${(this.value - 5000) / 1950}%, var(--primary-blue) 100%)`;
+            });
+            
+            // Initialize gradients
+            minPriceSlider.dispatchEvent(new Event('input'));
+            maxPriceSlider.dispatchEvent(new Event('input'));
+        }
+
+        // Update progress bar and steps
+        function updateProgress() {
+            // Calculate progress percentage
+            const progressPercentage = ((currentScreen - 1) / (totalScreens - 1)) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // Update step classes
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                
+                if (index + 1 < currentScreen) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentScreen) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update screen title and description
+            updateScreenInfo();
+            
+            // Update button states
+            updateButtons();
+            
+            // Update summary if we're on screen 3
+            if (currentScreen === 3) {
+                updateSummary();
+            }
+        }
+
+        // Update screen title and description
+        function updateScreenInfo() {
+            switch(currentScreen) {
+                case 1:
+                    screenTitle.textContent = 'Основные характеристики';
+                    screenDescription.textContent = 'Укажите базовые параметры смартфона, который вы ищете';
+                    break;
+                case 2:
+                    screenTitle.textContent = 'Выбор приоритета';
+                    screenDescription.textContent = 'Определите главную цель использования смартфона';
+                    break;
+                case 3:
+                    screenTitle.textContent = 'Подтверждение параметров';
+                    screenDescription.textContent = 'Проверьте выбранные параметры перед поиском';
+                    break;
+            }
+        }
+
+        // Update button states
+        function updateButtons() {
+            // Show/Hide "Показать смартфоны" button on screen 1
+            if (currentScreen === 1) {
+                showPhonesBtn.style.display = 'flex';
+                prevBtn.style.display = 'none';
+            } else {
+                showPhonesBtn.style.display = 'none';
+                prevBtn.style.display = 'flex';
+            }
+            
+            // Previous button
+            prevBtn.disabled = currentScreen === 1;
+            
+            // Next/Final button
+            if (currentScreen === totalScreens) {
+                nextBtn.style.display = 'none';
+                findBtn.style.display = 'flex';
+            } else {
+                nextBtn.style.display = 'flex';
+                findBtn.style.display = 'none';
+            }
+            
+            // Disable next button if priority not selected on screen 2
+            if (currentScreen === 2 && !selectedPriority) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Navigate to next screen
+        function nextScreen() {
+            if (currentScreen < totalScreens) {
+                // Hide current screen
+                screens[currentScreen - 1].classList.remove('active');
+                
+                // Show next screen
+                currentScreen++;
+                screens[currentScreen - 1].classList.add('active');
+                
+                // Update progress
+                updateProgress();
+            }
+        }
+
+        // Navigate to previous screen
+        function prevScreen() {
+            if (currentScreen > 1) {
+                // Hide current screen
+                screens[currentScreen - 1].classList.remove('active');
+                
+                // Show previous screen
+                currentScreen--;
+                screens[currentScreen - 1].classList.add('active');
+                
+                // Update progress
+                updateProgress();
+            }
+        }
+
+        // Handle priority selection
+        function selectPriority(priority) {
+            // Remove selected class from all options
+            priorityOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelector(`[data-priority="${priority}"]`);
+            selectedOption.classList.add('selected');
+            
+            // Update selected priority
+            selectedPriority = priority;
+            
+            // Hide all detail sections
+            priorityDetails.forEach(detail => {
+                detail.classList.remove('active');
+            });
+            
+            // Show details for selected priority
+            const detailsElement = document.getElementById(`${priority}-details`);
+            if (detailsElement) {
+                detailsElement.classList.add('active');
+            }
+            
+            // Enable next button
+            updateButtons();
+        }
+
+        // Get selected value for a dropdown
+        function getSelectedValue(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                return element.options[element.selectedIndex].text;
+            }
+            return 'Не указано';
+        }
+
+        // Update summary on screen 3
+        function updateSummary() {
+            // Get price values from sliders
+            const minPrice = minPriceSlider.value ? new Intl.NumberFormat('ru-RU').format(minPriceSlider.value) : 'Не указано';
+            const maxPrice = maxPriceSlider.value ? new Intl.NumberFormat('ru-RU').format(maxPriceSlider.value) : 'Не указано';
+            
+            // Get other basic parameters
+            const os = getSelectedValue('os');
+            const ram = getSelectedValue('ram');
+            const storage = getSelectedValue('storage');
+            const screenSize = getSelectedValue('screenSize');
+            const battery = getSelectedValue('battery');
+            const displayType = getSelectedValue('displayType');
+            const color = getSelectedValue('color');
+            const availability = getSelectedValue('availability');
+            const charging = getSelectedValue('charging');
+            const nfc = getSelectedValue('nfc');
+            const size = getSelectedValue('size');
+            
+            // Update basic parameters summary
+            const basicSummary = document.getElementById('summary-basic');
+            basicSummary.innerHTML = `
+                <div class="summary-item"><strong>Бюджет:</strong> ${minPrice} - ${maxPrice} ₽</div>
+                <div class="summary-item"><strong>ОС:</strong> ${os}</div>
+                <div class="summary-item"><strong>ОЗУ:</strong> ${ram}</div>
+                <div class="summary-item"><strong>Память:</strong> ${storage}</div>
+                <div class="summary-item"><strong>Экран:</strong> ${screenSize}</div>
+                <div class="summary-item"><strong>Тип матрицы:</strong> ${displayType}</div>
+                <div class="summary-item"><strong>Аккумулятор:</strong> ${battery}</div>
+                <div class="summary-item"><strong>Зарядка:</strong> ${charging}</div>
+                <div class="summary-item"><strong>Цвет:</strong> ${color}</div>
+                <div class="summary-item"><strong>NFC:</strong> ${nfc}</div>
+                <div class="summary-item"><strong>Размер:</strong> ${size}</div>
+                <div class="summary-item"><strong>Наличие:</strong> ${availability}</div>
+            `;
+            
+            // Update priority summary
+            const priorityContainer = document.getElementById('summary-priority-container');
+            let priorityContent = '';
+            
+            if (selectedPriority === 'gaming') {
+                priorityContent = `
+                    <div class="priority-criteria-card">
+                        <div class="priority-criteria-header">
+                            <i class="fas fa-gamepad"></i>
+                            <h5>Приоритет: Игры</h5>
+                        </div>
+                        <div class="criteria-grid">
+                            <div class="criterion-item">
+                                <span class="criterion-name">Процессор:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-processor-name')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Техпроцесс:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-tech-process')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Графический ускоритель:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-gpu')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Частота обновления:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-refresh')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Опрос тачскрина:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-touch-sampling')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Система охлаждения:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-cooling')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Игровые триггеры:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-triggers')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Скорость зарядки:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-charging')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Звук в играх:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-audio')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Температурный режим:</span>
+                                <span class="criterion-value">${getSelectedValue('gaming-temperature')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (selectedPriority === 'camera') {
+                priorityContent = `
+                    <div class="priority-criteria-card">
+                        <div class="priority-criteria-header">
+                            <i class="fas fa-camera"></i>
+                            <h5>Приоритет: Камера</h5>
+                        </div>
+                        <div class="criteria-grid">
+                            <div class="criterion-item">
+                                <span class="criterion-name">Тип сенсора:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-sensor-type')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Размер сенсора:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-sensor-size')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Размер пикселя:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-pixel-size')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Диафрагма:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-aperture')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Оптическая стабилизация:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-ois')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Ультраширик:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-ultrawide')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Макрообъектив:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-macro')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Телеобъектив:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-tele')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Автофокус фронтальной:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-front-af')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Видеосъемка:</span>
+                                <span class="criterion-value">${getSelectedValue('camera-video')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (selectedPriority === 'battery') {
+                priorityContent = `
+                    <div class="priority-criteria-card">
+                        <div class="priority-criteria-header">
+                            <i class="fas fa-battery-full"></i>
+                            <h5>Приоритет: Автономность</h5>
+                        </div>
+                        <div class="criteria-grid">
+                            <div class="criterion-item">
+                                <span class="criterion-name">Тип аккумулятора:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-type')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Автономность:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-life')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Мощность зарядки:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-charge-power')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Беспроводная зарядка:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-wireless')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Обратная зарядка:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-reverse')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Энергоэффективный экран:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-screen')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Износ батареи:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-degradation')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Режимы энергосбережения:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-saver-modes')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Зарядка за 15 мин:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-15min-charge')}</span>
+                            </div>
+                            <div class="criterion-item">
+                                <span class="criterion-name">Энергоэффективный процессор:</span>
+                                <span class="criterion-value">${getSelectedValue('battery-efficient-cpu')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            priorityContainer.innerHTML = priorityContent;
+        }
+
+        // Handle find button click (final action)
+        function findSmartphone() {
+            // In a real application, this would send data to the server
+            // and redirect to results page or show results in a modal
+            
+            // For demo purposes, show an alert
+            alert('Поиск смартфонов по вашим критериям запущен! Система анализирует более 500 моделей и подберет для вас лучшие варианты.');
+            
+            // Simulate loading
+            findBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Поиск...';
+            findBtn.disabled = true;
+            
+            // In a real app, you would make an API call here
+            setTimeout(() => {
+                // Reset button after "search"
+                findBtn.innerHTML = '<i class="fas fa-search"></i> Найти смартфон';
+                findBtn.disabled = false;
+                
+                // Redirect to results page (simulated)
+                // window.location.href = '/results.html';
+            }, 2000);
+        }
+
+        // Handle "Show phones" button click
+        function showPhones() {
+            alert('Показаны популярные смартфоны по вашим критериям. В реальном приложении здесь был бы переход на страницу с результатами.');
+            
+            // Simulate loading
+            showPhonesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
+            showPhonesBtn.disabled = true;
+            
+            setTimeout(() => {
+                // Reset button
+                showPhonesBtn.innerHTML = '<i class="fas fa-eye"></i> Показать смартфоны';
+                showPhonesBtn.disabled = false;
+            }, 1500);
+        }
+
+        // Header functionality
+        function initHeader() {
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                mobileMenuBtn.innerHTML = navMenu.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navMenu.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+            
+            // Navigation links active state
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Close mobile menu on mobile
+                    if (window.innerWidth <= 768) {
+                        navMenu.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                    
+                    // In real app, here would be navigation logic
+                    console.log(`Навигация на: ${this.textContent}`);
+                });
+            });
+            
+            // Action buttons
+            compareBtn.addEventListener('click', () => {
+                alert('Переход в раздел сравнения смартфонов');
+            });
+            
+            favoritesBtn.addEventListener('click', () => {
+                alert('Переход в избранное');
+            });
+            
+            userBtn.addEventListener('click', () => {
+                alert('Вход в личный кабинет');
+            });
+        }
+
+        // Initialize event listeners
+        function init() {
+            // Initialize price slider
+            initPriceSlider();
+            
+            // Header
+            initHeader();
+            
+            // Navigation buttons
+            nextBtn.addEventListener('click', nextScreen);
+            prevBtn.addEventListener('click', prevScreen);
+            findBtn.addEventListener('click', findSmartphone);
+            showPhonesBtn.addEventListener('click', showPhones);
+            
+            // Priority selection
+            priorityOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const priority = this.getAttribute('data-priority');
+                    selectPriority(priority);
+                });
+            });
+            
+            // Initialize progress
+            updateProgress();
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
