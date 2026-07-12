@@ -41,4 +41,9 @@ $c = $a + $b;
 
  ![картинка]()
 
+ item | Plus | value 
+ :--- | :--: | ----: 
+ item | Plus | value 
+ item | Plus | value 
+
  
